@@ -15,6 +15,8 @@
 
 namespace ContaoCommunityAlliance\Contao\Events\CreateOptions;
 
+use ContaoCommunityAlliance\Contao\Bindings\ContaoEvents;
+use ContaoCommunityAlliance\Contao\Bindings\Events\Controller\GetTemplateGroupEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
@@ -79,5 +81,27 @@ class CreateOptionsEventCallbackFactory
 		else {
 			return $callback;
 		}
+	}
+
+	/**
+	 * Convenience method to generate a "getTemplateGroup" callback.
+	 *
+	 * @param string $prefix
+	 *
+	 * @return array Return a Contao callback that can be used as options_callback.
+	 */
+	static public function createTemplateGroupCallback($prefix)
+	{
+		$callable = function() use ($prefix) {
+			$event = new GetTemplateGroupEvent($prefix);
+
+			/** @var EventDispatcher $eventDispatcher */
+			$eventDispatcher = $GLOBALS['container']['event-dispatcher'];
+			$eventDispatcher->dispatch(ContaoEvents::CONTROLLER_GET_TEMPLATE_GROUP, $event);
+
+			return $event->getTemplates()->getArrayCopy();
+		};
+
+		return static::createCallableCallback($callable);
 	}
 }
