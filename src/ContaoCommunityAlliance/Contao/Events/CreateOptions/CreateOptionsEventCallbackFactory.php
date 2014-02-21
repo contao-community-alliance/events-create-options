@@ -59,4 +59,25 @@ class CreateOptionsEventCallbackFactory
 			return $callback;
 		}
 	}
+
+	/**
+	 * Create a new options callback, that calls any callable.
+	 *
+	 * @param callable $callable
+	 *
+	 * @return array Return a Contao callback that can be used as options_callback.
+	 */
+	static public function createCallableCallback($callable)
+	{
+		$callback = function ($dc) use ($callable) {
+			return call_user_func($callable, $dc);
+		};
+
+		if (version_compare(VERSION, '3.2', '<')) {
+			return CreateOptionsEventCallbackHelper::registerEventCallback($callback);
+		}
+		else {
+			return $callback;
+		}
+	}
 }
