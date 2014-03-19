@@ -44,7 +44,7 @@ class CreateOptionsEventCallbackHelper
 
 		return array(
 			'ContaoCommunityAlliance\Contao\EventDispatcher\Helper\CreateOptionsEventCallbackHelper',
-			static::$eventNames[$methodName]
+			$methodName
 		);
 	}
 

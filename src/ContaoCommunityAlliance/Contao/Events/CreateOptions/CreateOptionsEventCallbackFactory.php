@@ -35,23 +35,7 @@ class CreateOptionsEventCallbackFactory
 	static public function createCallback($eventName, $classOrFactory = null)
 	{
 		$callback = function ($dc) use ($eventName, $classOrFactory) {
-			if (!$classOrFactory) {
-				$event = new CreateOptionsEvent($dc);
-			}
-			else if (is_callable($classOrFactory)) {
-				$event = call_user_func($classOrFactory, $dc);
-			}
-			else {
-				/** @var CreateOptionsEvent $event */
-				$event = new $classOrFactory($dc);
-			}
-
-			/** @var EventDispatcher $eventDispatcher */
-			$eventDispatcher = $GLOBALS['container']['event-dispatcher'];
-			$eventDispatcher->dispatch($eventName, $event);
-
-			return $event->getOptions()
-				->getArrayCopy();
+			return CreateOptionsEventHelper::invoke($dc, $eventName, $classOrFactory);
 		};
 
 		if (version_compare(VERSION, '3.2', '<')) {
@@ -92,7 +76,7 @@ class CreateOptionsEventCallbackFactory
 	 */
 	static public function createTemplateGroupCallback($prefix)
 	{
-		$callable = function() use ($prefix) {
+		$callable = function () use ($prefix) {
 			$event = new GetTemplateGroupEvent($prefix);
 
 			/** @var EventDispatcher $eventDispatcher */
