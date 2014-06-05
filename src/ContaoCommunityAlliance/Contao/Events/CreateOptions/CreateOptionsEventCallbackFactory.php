@@ -15,6 +15,8 @@
 
 namespace ContaoCommunityAlliance\Contao\Events\CreateOptions;
 
+use ContaoCommunityAlliance\Contao\Bindings\ContaoEvents;
+use ContaoCommunityAlliance\Contao\Bindings\Events\Controller\GetTemplateGroupEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
@@ -33,23 +35,7 @@ class CreateOptionsEventCallbackFactory
 	static public function createCallback($eventName, $classOrFactory = null)
 	{
 		$callback = function ($dc) use ($eventName, $classOrFactory) {
-			if (!$classOrFactory) {
-				$event = new CreateOptionsEvent($dc);
-			}
-			else if (is_callable($classOrFactory)) {
-				$event = call_user_func($classOrFactory, $dc);
-			}
-			else {
-				/** @var CreateOptionsEvent $event */
-				$event = new $classOrFactory($dc);
-			}
-
-			/** @var EventDispatcher $eventDispatcher */
-			$eventDispatcher = $GLOBALS['container']['event-dispatcher'];
-			$eventDispatcher->dispatch($eventName, $event);
-
-			return $event->getOptions()
-				->getArrayCopy();
+			return CreateOptionsEventHelper::invoke($dc, $eventName, $classOrFactory);
 		};
 
 		if (version_compare(VERSION, '3.2', '<')) {
@@ -58,5 +44,48 @@ class CreateOptionsEventCallbackFactory
 		else {
 			return $callback;
 		}
+	}
+
+	/**
+	 * Create a new options callback, that calls any callable.
+	 *
+	 * @param callable $callable
+	 *
+	 * @return array Return a Contao callback that can be used as options_callback.
+	 */
+	static public function createCallableCallback($callable)
+	{
+		$callback = function ($dc) use ($callable) {
+			return call_user_func($callable, $dc);
+		};
+
+		if (version_compare(VERSION, '3.2', '<')) {
+			return CreateOptionsEventCallbackHelper::registerEventCallback($callback);
+		}
+		else {
+			return $callback;
+		}
+	}
+
+	/**
+	 * Convenience method to generate a "getTemplateGroup" callback.
+	 *
+	 * @param string $prefix
+	 *
+	 * @return array Return a Contao callback that can be used as options_callback.
+	 */
+	static public function createTemplateGroupCallback($prefix)
+	{
+		$callable = function () use ($prefix) {
+			$event = new GetTemplateGroupEvent($prefix);
+
+			/** @var EventDispatcher $eventDispatcher */
+			$eventDispatcher = $GLOBALS['container']['event-dispatcher'];
+			$eventDispatcher->dispatch(ContaoEvents::CONTROLLER_GET_TEMPLATE_GROUP, $event);
+
+			return $event->getTemplates()->getArrayCopy();
+		};
+
+		return static::createCallableCallback($callable);
 	}
 }
