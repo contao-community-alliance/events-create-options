@@ -3,7 +3,7 @@
 	"description":"options_callback event and helpers for Contao Open Source CMS",
 	"keywords":["contao", "event", "options_callback"],
 	"type": "contao-module",
-	"license":"LGPL-3.0+",
+	"license":"LGPL-3.0-or-later",
 	"authors":[
 		{
 			"name":"Tristan Lins",
