@@ -3,7 +3,7 @@
 	"description":"options_callback event and helpers for Contao Open Source CMS",
 	"keywords":["contao", "event", "options_callback"],
 	"type": "contao-module",
-	"license":"LGPL-3.0+",
+	"license":"LGPL-3.0-or-later",
 	"authors":[
 		{
 			"name":"Tristan Lins",
@@ -20,10 +20,10 @@
 		"source":"https://github.com/contao-community-alliance/events-create-options"
 	},
 	"require":{
-		"php":">=5.3",
-		"contao/core": ">=2.11,<4-dev",
-		"contao-community-alliance/composer-plugin": "~2.0",
-		"contao-community-alliance/event-dispatcher": "~1.0"
+		"php":"^5.6 || ^7.0",
+		"contao/core": "^3.5.5",
+		"contao-community-alliance/composer-plugin": "^2.0",
+		"contao-community-alliance/event-dispatcher": "^1.0"
 	},
 	"autoload":{
 		"psr-0":{
